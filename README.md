@@ -1,151 +1,323 @@
-# ILOS Mobile App
+# 📱 ILOS EAMVU Mobile App
 
-**Intelligent Loan Origination System** - Mobile application for EAMVU Officers
+A React Native mobile application for EAMVU (External Asset Management & Verification Unit) officers to manage loan applications in the field.
 
-## Overview
-
-ILOS Mobile is a React Native application designed for EAMVU (External Agent Mobile Verification Unit) Officers to manage and process loan applications assigned to them. The app provides a streamlined interface for viewing application details, managing document collection, and updating application statuses.
-
-## Features
-
-### 🏠 **Splash Screen**
-- UBL branding with blue background (#3B82F6)
-- App name and description display
-- 3-second auto-navigation to login
-
-### 🔐 **Login Screen**
-- Username and password authentication
-- Clean, professional design matching web app
-- Role-based login (EAMVU Officer)
-
-### 📱 **Home Screen**
-- List of assigned applications
-- Application status indicators
-- Priority badges (High, Medium, Low)
-- Pull-to-refresh functionality
-- Quick access to application details
-
-### 📋 **Application Detail Screen**
-- Complete application information
-- Applicant details and contact information
-- Loan type and amount details
-- Required documents list
-- Document status management
-- Notes and special instructions
-
-## Screenshots
-
-The app follows the design patterns from the web application:
-- [Web App Login](https://ilos-frontend.vercel.app/login)
-- [EAMVU Dashboard](https://ilos-frontend.vercel.app/dashboard/eamvu/new)
-
-## Technical Stack
-
-- **React Native** 0.80.2
-- **TypeScript** for type safety
-- **React Navigation** for routing
-- **Custom Components** for consistent UI
-
-## Project Structure
+## 🏗️ **System Architecture**
 
 ```
-src/
-├── components/          # Reusable UI components
-├── navigation/          # Navigation configuration
-├── screens/            # Main app screens
-├── types/              # TypeScript interfaces
-├── utils/              # Mock data and utilities
-└── assets/             # Images and static files
+Mobile App (React Native) → API Service → Backend (Node.js/Express) → Database (PostgreSQL)
 ```
 
-## Getting Started
+## 🔗 **Integration with ILOS Backend**
 
-### Prerequisites
+This mobile app integrates with the existing ILOS backend system using the same APIs as the web application:
 
-- Node.js >= 18
+### **Backend APIs Used:**
+- `GET /api/applications/department/eamvu` - Fetch EAMVU applications
+- `GET /api/applications/form/:losId` - Get application details
+- `POST /api/applications/update-status` - Update application status
+- `POST /api/applications/update-comment` - Update comments
+- `GET /api/applications/comments/:losId` - Get application comments
+- `GET /api/documents/:losId` - Get application documents
+- `POST /api/upload-document` - Upload documents
+
+## 🎨 **UBL Styling Integration**
+
+The mobile app matches the UBL branding and styling from the web application:
+
+- **Primary Color**: `#1E40AF` (UBL Blue)
+- **Secondary Color**: `#3B82F6`
+- **Header Design**: Matches web app navbar styling
+- **Status Colors**: Consistent with web app color scheme
+- **Typography**: UBL brand fonts and styling
+
+## 📋 **Features**
+
+### **✅ Implemented Features**
+- ✅ Real-time application fetching from backend
+- ✅ Application details with full form data
+- ✅ Status updates (Submit to COPS/CIU/RRU)
+- ✅ Document management and status updates
+- ✅ Comments system per department
+- ✅ Pull-to-refresh functionality
+- ✅ Error handling and retry mechanisms
+- ✅ Offline-friendly with proper error states
+- ✅ UBL branding and styling
+- ✅ Phone call integration
+- ✅ Maps integration for addresses
+
+### **🔄 EAMVU Workflow**
+1. **View Assigned Applications** - See all applications assigned to EAMVU
+2. **Field Verification** - Visit applicants and verify documents
+3. **Status Updates** - Submit to next department or return application
+4. **Document Management** - Update document collection status
+5. **Comments** - Add notes and observations
+
+## 🚀 **Quick Start**
+
+### **Prerequisites**
+- Node.js 18+
 - React Native CLI
 - Android Studio / Xcode
+- Backend server running on `localhost:5000`
 
-### Installation
+### **Installation**
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+1. **Install Dependencies**
+```bash
+cd ILOS-Mobile-App
+npm install
+```
 
-3. For Android:
-   ```bash
-   npm run android
-   ```
+2. **Configure Backend URL**
+Edit `src/utils/config.js`:
+```javascript
+development: {
+  API_BASE_URL: 'http://localhost:5000', // Your backend URL
+  API_TIMEOUT: 30000,
+  DEBUG: true,
+},
+```
 
-4. For iOS:
-   ```bash
-   npm run ios
-   ```
+3. **Run the App**
+```bash
+# Android
+npm run android
 
-### Login Credentials
+# iOS
+npm run ios
 
-For testing purposes:
-- **Username:** `eamvu`
-- **Password:** `password`
+# Start Metro bundler
+npm start
+```
 
-## Mock Data
+## 📱 **App Screens**
 
-The app includes realistic mock data with:
-- 3 sample applications
-- Different loan types (Personal, Auto, Business)
-- Various document requirements
-- Realistic Pakistani addresses and phone numbers
+### **1. Home Screen**
+- Displays all EAMVU applications
+- Pull-to-refresh functionality
+- Application cards with key information
+- UBL header with officer details
 
-## Design Principles
+### **2. Application Detail Screen**
+- Complete application information
+- Document management
+- Status update options
+- Comments and notes
+- Quick actions (call, maps)
 
-### User Experience
-- **Minimalistic Design**: Clean, uncluttered interface
-- **Age-Appropriate**: Optimized for users aged 30-40
-- **Professional**: Banking-grade UI/UX
-- **Accessible**: Large touch targets and clear typography
+## 🔧 **Configuration**
 
-### Color Scheme
-- **Primary Blue**: #3B82F6 (UBL brand color)
-- **Success Green**: #10b981
-- **Warning Orange**: #f59e0b
-- **Error Red**: #ef4444
-- **Neutral Grays**: Various shades for text and backgrounds
+### **Environment Setup**
+The app uses a configuration system for different environments:
 
-## Features for EAMVU Officers
+```javascript
+// src/utils/config.js
+const ENV = {
+  development: {
+    API_BASE_URL: 'http://localhost:5000',
+    DEBUG: true,
+  },
+  production: {
+    API_BASE_URL: 'https://your-production-backend.vercel.app',
+    DEBUG: false,
+  },
+};
+```
 
-### Application Management
-- View assigned applications
-- Check application status
-- Access applicant contact information
-- Review loan details and amounts
+### **API Configuration**
+All API endpoints are centralized in the configuration:
 
-### Document Collection
-- View required documents
-- Update document collection status
-- Mark documents as verified
-- Track collection progress
+```javascript
+export const API_ENDPOINTS = {
+  EAMVU_APPLICATIONS: '/api/applications/department/eamvu',
+  APPLICATION_DETAILS: (losId) => `/api/applications/form/${losId}`,
+  UPDATE_STATUS: '/api/applications/update-status',
+  // ... more endpoints
+};
+```
 
-### Field Work Support
-- Access visit addresses
-- View special instructions
-- Update application progress
-- Manage multiple applications
+## 📊 **Data Flow**
 
-## Future Enhancements
+### **1. Application Fetching**
+```
+Mobile App → API Service → Backend → Database
+```
 
-- Real-time notifications
-- Offline capability
-- Document photo capture
-- GPS location tracking
-- Integration with web backend
-- Push notifications for new assignments
+### **2. Status Updates**
+```
+User Action → API Call → Backend Update → Database → UI Refresh
+```
 
-## Contributing
+### **3. Error Handling**
+```
+API Error → Error Handler → User-Friendly Message → Retry Option
+```
 
-This is a UBL internal application. For questions or issues, please contact the development team.
+## 🛠️ **Development**
 
-## License
+### **File Structure**
+```
+src/
+├── utils/
+│   ├── api.js          # API service layer
+│   ├── config.js       # Configuration
+│   ├── dataTransformer.js # Data transformation
+│   └── mockData.js     # Mock data for testing
+├── screens/
+│   ├── HomeScreen.jsx      # Main applications list
+│   ├── ApplicationDetailScreen.jsx # Application details
+│   ├── LoginScreen.jsx     # Login screen
+│   └── SplashScreen.jsx    # Splash screen
+├── components/
+│   └── StatusBadge.jsx     # Status badge component
+└── navigation/
+    └── AppNavigator.jsx    # Navigation setup
+```
 
-Internal use only - UBL Bank
+### **Key Components**
+
+#### **API Service (`src/utils/api.js`)**
+- Centralized API communication
+- Error handling and logging
+- Request/response interceptors
+- Batch operations support
+
+#### **Data Transformer (`src/utils/dataTransformer.js`)**
+- Converts backend data to mobile format
+- Handles different application types
+- Status and priority mapping
+- Currency and date formatting
+
+#### **Configuration (`src/utils/config.js`)**
+- Environment-specific settings
+- API endpoints
+- Error messages
+- App constants
+
+## 🔍 **Testing**
+
+### **Backend Connection Test**
+```javascript
+import apiService from './src/utils/api';
+
+// Test backend connection
+const testConnection = async () => {
+  const result = await apiService.testBackendConnection();
+  console.log('Backend connection:', result);
+};
+```
+
+### **API Endpoints Test**
+```javascript
+// Test EAMVU applications endpoint
+const testApplications = async () => {
+  try {
+    const apps = await apiService.getEAMVUApplications();
+    console.log('Applications:', apps);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+};
+```
+
+## 🚨 **Troubleshooting**
+
+### **Common Issues**
+
+1. **Backend Connection Failed**
+   - Check if backend is running on `localhost:5000`
+   - Verify network connectivity
+   - Check firewall settings
+
+2. **No Applications Showing**
+   - Verify backend has EAMVU applications
+   - Check API endpoint `/api/applications/department/eamvu`
+   - Review backend logs for errors
+
+3. **Status Update Failed**
+   - Verify application exists in database
+   - Check status values match backend expectations
+   - Review backend update logic
+
+### **Debug Mode**
+Enable debug logging in `src/utils/config.js`:
+```javascript
+development: {
+  DEBUG: true, // Set to true for detailed logs
+}
+```
+
+## 📈 **Performance**
+
+### **Optimizations**
+- ✅ Lazy loading of application details
+- ✅ Efficient data transformation
+- ✅ Proper error handling
+- ✅ Offline state management
+- ✅ Pull-to-refresh for updates
+
+### **Memory Management**
+- ✅ Proper component cleanup
+- ✅ Efficient list rendering
+- ✅ Image optimization
+- ✅ API response caching
+
+## 🔐 **Security**
+
+### **Implemented Security**
+- ✅ Input validation
+- ✅ Error message sanitization
+- ✅ Secure API communication
+- ✅ Environment-based configuration
+
+## 📱 **Platform Support**
+
+- ✅ Android (API 21+)
+- ✅ iOS (iOS 12+)
+- ✅ React Native 0.80.2
+- ✅ Expo compatibility (if needed)
+
+## 🚀 **Deployment**
+
+### **Android Build**
+```bash
+cd android
+./gradlew assembleRelease
+```
+
+### **iOS Build**
+```bash
+cd ios
+xcodebuild -workspace ILOS.xcworkspace -scheme ILOS -configuration Release
+```
+
+## 📞 **Support**
+
+For issues or questions:
+1. Check the backend logs
+2. Verify API endpoints
+3. Test with Postman/curl
+4. Review mobile app logs
+
+## 🔄 **Integration Status**
+
+### **✅ Fully Integrated**
+- Application fetching
+- Status updates
+- Document management
+- Comments system
+- Error handling
+- UBL styling
+
+### **🔄 Ready for Production**
+- All core features implemented
+- Backend integration complete
+- Error handling robust
+- UI/UX polished
+
+---
+
+**Mobile App Status: ✅ READY FOR EAMVU OFFICERS**
+
+The mobile app is fully integrated with the ILOS backend system and ready for EAMVU officers to use in the field for loan application verification and management.

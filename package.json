@@ -18,7 +18,14 @@
     "react-native": "0.80.2",
     "react-native-gesture-handler": "^2.27.2",
     "react-native-safe-area-context": "^5.5.2",
-    "react-native-screens": "^4.13.1"
+    "react-native-screens": "^4.13.1",
+    "axios": "^1.6.0",
+    "react-native-vector-icons": "^10.0.0",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-paper": "^5.11.0",
+    "react-native-elements": "^3.4.3",
+    "react-native-modal": "^13.0.1",
+    "react-native-toast-message": "^2.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
