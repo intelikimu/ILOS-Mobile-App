@@ -1,97 +1,151 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# ILOS Mobile App
 
-# Getting Started
+**Intelligent Loan Origination System** - Mobile application for EAMVU Officers
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Overview
 
-## Step 1: Start Metro
+ILOS Mobile is a React Native application designed for EAMVU (External Agent Mobile Verification Unit) Officers to manage and process loan applications assigned to them. The app provides a streamlined interface for viewing application details, managing document collection, and updating application statuses.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Features
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 🏠 **Splash Screen**
+- UBL branding with blue background (#3B82F6)
+- App name and description display
+- 3-second auto-navigation to login
 
-```sh
-# Using npm
-npm start
+### 🔐 **Login Screen**
+- Username and password authentication
+- Clean, professional design matching web app
+- Role-based login (EAMVU Officer)
 
-# OR using Yarn
-yarn start
+### 📱 **Home Screen**
+- List of assigned applications
+- Application status indicators
+- Priority badges (High, Medium, Low)
+- Pull-to-refresh functionality
+- Quick access to application details
+
+### 📋 **Application Detail Screen**
+- Complete application information
+- Applicant details and contact information
+- Loan type and amount details
+- Required documents list
+- Document status management
+- Notes and special instructions
+
+## Screenshots
+
+The app follows the design patterns from the web application:
+- [Web App Login](https://ilos-frontend.vercel.app/login)
+- [EAMVU Dashboard](https://ilos-frontend.vercel.app/dashboard/eamvu/new)
+
+## Technical Stack
+
+- **React Native** 0.80.2
+- **TypeScript** for type safety
+- **React Navigation** for routing
+- **Custom Components** for consistent UI
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+├── navigation/          # Navigation configuration
+├── screens/            # Main app screens
+├── types/              # TypeScript interfaces
+├── utils/              # Mock data and utilities
+└── assets/             # Images and static files
 ```
 
-## Step 2: Build and run your app
+## Getting Started
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Prerequisites
 
-### Android
+- Node.js >= 18
+- React Native CLI
+- Android Studio / Xcode
 
-```sh
-# Using npm
-npm run android
+### Installation
 
-# OR using Yarn
-yarn android
-```
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### iOS
+3. For Android:
+   ```bash
+   npm run android
+   ```
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+4. For iOS:
+   ```bash
+   npm run ios
+   ```
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+### Login Credentials
 
-```sh
-bundle install
-```
+For testing purposes:
+- **Username:** `eamvu`
+- **Password:** `password`
 
-Then, and every time you update your native dependencies, run:
+## Mock Data
 
-```sh
-bundle exec pod install
-```
+The app includes realistic mock data with:
+- 3 sample applications
+- Different loan types (Personal, Auto, Business)
+- Various document requirements
+- Realistic Pakistani addresses and phone numbers
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Design Principles
 
-```sh
-# Using npm
-npm run ios
+### User Experience
+- **Minimalistic Design**: Clean, uncluttered interface
+- **Age-Appropriate**: Optimized for users aged 30-40
+- **Professional**: Banking-grade UI/UX
+- **Accessible**: Large touch targets and clear typography
 
-# OR using Yarn
-yarn ios
-```
+### Color Scheme
+- **Primary Blue**: #3B82F6 (UBL brand color)
+- **Success Green**: #10b981
+- **Warning Orange**: #f59e0b
+- **Error Red**: #ef4444
+- **Neutral Grays**: Various shades for text and backgrounds
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Features for EAMVU Officers
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Application Management
+- View assigned applications
+- Check application status
+- Access applicant contact information
+- Review loan details and amounts
 
-## Step 3: Modify your app
+### Document Collection
+- View required documents
+- Update document collection status
+- Mark documents as verified
+- Track collection progress
 
-Now that you have successfully run the app, let's make changes!
+### Field Work Support
+- Access visit addresses
+- View special instructions
+- Update application progress
+- Manage multiple applications
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Future Enhancements
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+- Real-time notifications
+- Offline capability
+- Document photo capture
+- GPS location tracking
+- Integration with web backend
+- Push notifications for new assignments
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## Contributing
 
-## Congratulations! :tada:
+This is a UBL internal application. For questions or issues, please contact the development team.
 
-You've successfully run and modified your React Native App. :partying_face:
+## License
 
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Internal use only - UBL Bank
