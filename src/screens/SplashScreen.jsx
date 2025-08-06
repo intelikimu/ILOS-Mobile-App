@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   StatusBar,
+  Image,
 } from 'react-native';
 
 const SplashScreen = ({ navigation }) => {
@@ -17,12 +18,13 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
       <View style={styles.logoContainer}>
         {/* Professional UBL Text Logo with Blue Background */}
-        <View style={styles.logoBackground}>
-          <Text style={styles.ublLogo}>UBL</Text>
-          <Text style={styles.ublSubtext}>United Bank Limited</Text>
+        <View >
+          <Image source={require('../assets/images/ublimage.png')} style={styles.ublLogo} />
+          {/* <Text style={styles.ublLogo}>UBL</Text>
+          <Text style={styles.ublSubtext}>United Bank Limited</Text> */}
         </View>
         
         <Text style={styles.appName}>ILOS Mobile</Text>
@@ -36,7 +38,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E40AF', // Professional UBL Blue
+    backgroundColor: '#3B82F6', // Professional UBL Blue
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -46,20 +48,20 @@ const styles = StyleSheet.create({
   logoBackground: {
     width: 160,
     height: 160,
-    backgroundColor: '#1E40AF', // Blue background
-    borderRadius: 80,
+    backgroundColor: '#3B82F6', // Blue background
+    // borderRadius: 80,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
-    borderWidth: 4,
-    borderColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    // borderWidth: 4,
+    // borderColor: 'white',
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 8,
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 12,
     elevation: 15,
   },
   ublLogo: {
@@ -68,6 +70,7 @@ const styles = StyleSheet.create({
     color: 'white',
     letterSpacing: 3,
     textAlign: 'center',
+    marginBottom: 30,
     fontFamily: 'monospace', // Professional banking font
   },
   ublSubtext: {

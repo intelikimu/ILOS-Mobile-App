@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
@@ -38,9 +39,10 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.content}>
         <View style={styles.header}>
           {/* Professional UBL Text Logo */}
-          <View style={styles.logoContainer}>
-            <Text style={styles.ublLogo}>UBL</Text>
-            <Text style={styles.ublSubtext}>United Bank Limited</Text>
+          <View >
+            <Image source={require('../assets/images/ublimage.png')} style={styles.ublLogo} />
+            {/* <Text style={styles.ublLogo}>UBL</Text>
+            <Text style={styles.ublSubtext}>United Bank Limited</Text> */}
           </View>
           <Text style={styles.title}>ILOS</Text>
           <Text style={styles.subtitle}>Intelligent Loan Origination System</Text>
@@ -89,10 +91,14 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#3B82F6',
+
+    // backgroundColor: '#f8fafc',
   },
   content: {
     flex: 1,
+    backgroundColor: '#3B82F6',
+
     justifyContent: 'center',
     paddingHorizontal: 30,
   },
@@ -100,30 +106,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 50,
   },
-  logoContainer: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#1E40AF',
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: '#3B82F6',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
+  // logoContainer: {
+  //   width: 220,
+  //   height: 220,
+  //   backgroundColor: '#1E40AF',
+  //   // borderRadius: "50%",
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   marginBottom: 20,
+  //   // borderWidth: 2,
+  //   borderColor: '#3B82F6',
+  //   // shadowColor: '#000',
+  //   // shadowOffset: {
+  //   //   width: 0,
+  //   //   height: 4,
+  //   // },
+  //   // shadowOpacity: 0.2,
+  //   // shadowRadius: 8,
+  //   elevation: 8,
+  // },
   ublLogo: {
+    // width: 150,
     fontSize: 28,
     fontWeight: '900',
-    color: 'white',
-    letterSpacing: 2,
+    // color: 'white',
+    // letterSpacing: 2,
+    marginBottom: 30,
     textAlign: 'center',
   },
   ublSubtext: {
@@ -138,12 +146,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 8,
+    color: '#ffffff',
+    margin: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#ffffff',
     textAlign: 'center',
   },
   formContainer: {
@@ -178,7 +186,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   loginButton: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: '#3B82F6',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
@@ -204,7 +212,7 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: '#3B82F6',
   },
 });
 

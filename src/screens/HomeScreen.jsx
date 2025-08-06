@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import { mockUser } from '../utils/mockData';
 import { getStatusColor, getPriorityColor, transformEAMVUApplications } from '../utils/dataTransformer';
 import apiService from '../utils/api';
 import { testBackendConnection } from '../utils/testConnection';
@@ -208,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
 
   const renderLoadingState = () => (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#1E40AF" />
+      <ActivityIndicator size="large" color="#3B82F6" />
       <Text style={styles.loadingText}>Loading applications...</Text>
     </View>
   );
@@ -225,22 +224,22 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
       
       {/* UBL Header - Matching web app styling */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.logoContainer}>
             <Image 
-              source={require('../assets/images/UBL.png')}
+              source={require('../assets/images/ublimage.png')}
               style={styles.logoImage}
               resizeMode="contain"
             />
           </View>
           <View style={styles.headerText}>
             <Text style={styles.welcomeText}>Welcome,</Text>
-            <Text style={styles.userName}>{mockUser.name}</Text>
-            <Text style={styles.roleText}>EAMVU Officer</Text>
+            <Text style={styles.userName}>EAMVU Officer</Text>
+            <Text style={styles.roleText}>ILOS Mobile App</Text>
           </View>
           <TouchableOpacity 
             style={styles.settingsButton}
@@ -353,7 +352,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    backgroundColor: '#1E40AF', // UBL Blue - matching web app
+    backgroundColor: '#3B82F6', // bg-blue-500 - matching web app exactly
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -372,26 +371,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   logoContainer: {
-    width: 60,
+    width: 80,
     height: 60,
-    backgroundColor: 'white',
-    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
   },
   logoImage: {
-    width: 50,
+    width: 70,
     height: 50,
+    tintColor: 'white', // Make logo white to match web app
   },
   headerText: {
     flex: 1,

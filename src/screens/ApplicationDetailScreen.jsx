@@ -200,7 +200,7 @@ const ApplicationDetailScreen = ({ navigation, route }) => {
 
   const renderLoadingState = () => (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#1E40AF" />
+      <ActivityIndicator size="large" color="#3B82F6" />
       <Text style={styles.loadingText}>Loading application details...</Text>
     </View>
   );
@@ -218,7 +218,7 @@ const ApplicationDetailScreen = ({ navigation, route }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+        <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
@@ -241,7 +241,7 @@ const ApplicationDetailScreen = ({ navigation, route }) => {
   if (error) {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+        <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
@@ -263,7 +263,7 @@ const ApplicationDetailScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
       
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: '#3B82F6', // bg-blue-500 - matching web app exactly
     paddingTop: 50,
     paddingBottom: 15,
     paddingHorizontal: 20,
