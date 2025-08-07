@@ -6,84 +6,62 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
+import { LinearGradient } from 'react-native-linear-gradient';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      // Check if user is already logged in
+      if (global.currentAgent) {
+        navigation.replace('Home');
+      } else {
+        navigation.replace('Login');
+      }
     }, 3000);
 
     return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
-      <View style={styles.logoContainer}>
-        {/* Professional UBL Text Logo with Blue Background */}
-        <View >
-          <Image source={require('../assets/images/ublimage.png')} style={styles.ublLogo} />
-          {/* <Text style={styles.ublLogo}>UBL</Text>
-          <Text style={styles.ublSubtext}>United Bank Limited</Text> */}
-        </View>
+    <LinearGradient
+      colors={['#3B82F6', '#1D4ED8']}
+      style={styles.container}
+    >
+      <StatusBar backgroundColor="#3B82F6" barStyle="light-content" />
+      
+      <View style={styles.content}>
+        <Image
+          source={require('../assets/images/ublimage.png')}
+          style={styles.ublLogo}
+          resizeMode="contain"
+        />
         
-        <Text style={styles.appName}>ILOS Mobile</Text>
-        <Text style={styles.subtitle}>Intelligent Loan Origination System</Text>
-        <Text style={styles.forText}>for EAMVU Officers</Text>
+        <Text style={styles.title}>ILOS Mobile</Text>
+        <Text style={styles.subtitle}>EAMVU Officer Portal</Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#3B82F6', // Professional UBL Blue
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoContainer: {
+  content: {
     alignItems: 'center',
-  },
-  logoBackground: {
-    width: 160,
-    height: 160,
-    backgroundColor: '#3B82F6', // Blue background
-    // borderRadius: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 40,
-    // borderWidth: 4,
-    // borderColor: 'white',
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 8,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 12,
-    elevation: 15,
   },
   ublLogo: {
-    width: 120,
+    width: 150,
     height: 80,
-    tintColor: 'white',
-    marginBottom: 30,
+    marginBottom: 20,
   },
-  ublSubtext: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'white',
-    opacity: 0.9,
-    textAlign: 'center',
-    marginTop: 2,
-    letterSpacing: 1,
-  },
-  appName: {
+  title: {
     fontSize: 28,
     fontWeight: '700',
     color: 'white',
-    marginBottom: 12,
+    marginBottom: 10,
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -92,15 +70,8 @@ const styles = StyleSheet.create({
     color: 'white',
     opacity: 0.9,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 20,
     fontWeight: '500',
-  },
-  forText: {
-    fontSize: 14,
-    color: 'white',
-    opacity: 0.8,
-    textAlign: 'center',
-    fontWeight: '400',
   },
 });
 

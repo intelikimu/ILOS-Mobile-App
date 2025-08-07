@@ -2,19 +2,65 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
+  StyleSheet,
   TouchableOpacity,
-  StatusBar,
-  RefreshControl,
-  Image,
   Alert,
+  RefreshControl,
   ActivityIndicator,
+  StatusBar,
+  Image,
   Modal,
 } from 'react-native';
-import { getStatusColor, getPriorityColor, transformEAMVUApplications } from '../utils/dataTransformer';
+import { LinearGradient } from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import apiService from '../utils/api';
+import { transformEAMVUApplications, getStatusColor, getPriorityColor } from '../utils/dataTransformer';
 import { testBackendConnection } from '../utils/testConnection';
+
+// Fallback icon component for when MaterialIcons fail to load
+const FallbackIcon = ({ name, size, color, style }) => {
+  const iconMap = {
+    'more-vert': '⋮',
+    'arrow-back': '←',
+    'phone': '📞',
+    'check-circle': '✓',
+    'assignment': '📋',
+    'person': '👤',
+    'location-on': '📍',
+    'work': '💼',
+    'account-balance': '💰',
+    'people': '👥',
+    'close': '✕',
+    'lock': '🔒',
+    'logout': '🚪',
+    'chevron-right': '›',
+    'map': '🗺️',
+    'error': '❌',
+  };
+
+  const icon = iconMap[name] || '•';
+  
+  return (
+    <Text style={[
+      { 
+        fontSize: size * 0.8,
+        color,
+        textAlign: 'center',
+        lineHeight: size,
+      }, 
+      style
+    ]}>
+      {icon}
+    </Text>
+  );
+};
+
+// Enhanced icon component with fallback
+const AppIcon = ({ name, size, color, style }) => {
+  // For now, always use fallback icons since MaterialIcons fonts aren't properly linked
+  return <FallbackIcon name={name} size={size} color={color} style={style} />;
+};
 
 const HomeScreen = ({ navigation }) => {
   const [applications, setApplications] = useState([]);
@@ -287,35 +333,41 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 
+  const renderHeader = () => (
+    <LinearGradient
+      colors={['#3B82F6', '#1D4ED8']}
+      style={styles.header}
+    >
+      <StatusBar backgroundColor="#3B82F6" barStyle="light-content" />
+      
+      <View style={styles.headerContent}>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require('../assets/images/ublimage.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+        </View>
+        
+        <View style={styles.headerCenter}>
+          <Text style={styles.welcomeText}>Welcome,</Text>
+          <Text style={styles.agentName}>{global.currentAgent?.name || 'Agent'}</Text>
+          <Text style={styles.agentId}>Agent ID: {global.currentAgent?.id || 'N/A'}</Text>
+        </View>
+        
+        <TouchableOpacity 
+          style={styles.settingsButton}
+          onPress={() => setSettingsVisible(true)}
+        >
+          <AppIcon name="more-vert" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
+  );
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
-      
-      {/* UBL Header - Matching web app styling */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/images/ublimage.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={styles.headerText}>
-            <Text style={styles.welcomeText}>Welcome,</Text>
-            <Text style={styles.userName}>{global.currentAgent?.name || 'EAMVU Officer'}</Text>
-            <Text style={styles.roleText}>Agent ID: {global.currentAgent?.id || 'Unknown'}</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.settingsButton}
-            onPress={() => setSettingsVisible(true)}
-          >
-            <View style={styles.settingsIcon}>
-              <Text style={styles.settingsIconText}>⋮</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
+      {renderHeader()}
 
       <View style={styles.content}>
         <View style={styles.sectionHeader}>
@@ -417,7 +469,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    backgroundColor: '#3B82F6', // bg-blue-500 - matching web app exactly
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -435,19 +486,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  logoContainer: {
+  headerLeft: {
     width: 80,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
   },
-  logoImage: {
-    width: 70,
-    height: 50,
-    tintColor: 'white', // Make logo white to match web app
-  },
-  headerText: {
+  headerCenter: {
     flex: 1,
   },
   welcomeText: {
@@ -455,13 +501,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.9,
   },
-  userName: {
+  agentName: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 2,
   },
-  roleText: {
+  agentId: {
     color: 'white',
     fontSize: 12,
     opacity: 0.8,
@@ -474,16 +520,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 10,
   },
-  settingsIcon: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  settingsIconText: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
+  logoImage: {
+    width: 70,
+    height: 50,
+    tintColor: 'white', // Make logo white to match web app
   },
   content: {
     flex: 1,

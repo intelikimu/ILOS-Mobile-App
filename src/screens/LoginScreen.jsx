@@ -5,12 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  StatusBar,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
+  StatusBar,
+  ScrollView,
   Image,
 } from 'react-native';
+import { LinearGradient } from 'react-native-linear-gradient';
 import { AGENT_CREDENTIALS } from '../utils/config';
 
 const LoginScreen = ({ navigation }) => {
@@ -38,25 +38,31 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Image
+        source={require('../assets/images/ublimage.png')}
+        style={styles.logoImage}
+        resizeMode="contain"
+      />
+      
+      <Text style={styles.title}>ILOS Mobile</Text>
+      <Text style={styles.subtitle}>EAMVU Officer Portal</Text>
+    </View>
+  );
+
   return (
-    <KeyboardAvoidingView 
+    <LinearGradient
+      colors={['#3B82F6', '#1E40AF']}
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
-      <View style={styles.content}>
-        <View style={styles.header}>
-          {/* Professional UBL Text Logo */}
-          <View >
-            <Image source={require('../assets/images/ublimage.png')} style={styles.ublLogo} />
-          </View>
-          <Text style={styles.title}>ILOS</Text>
-          <Text style={styles.subtitle}>Intelligent Loan Origination System</Text>
-        </View>
+      <ScrollView contentContainerStyle={styles.content}>
+        {renderHeader()}
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Agent Name</Text>
+            <Text style={styles.inputLabel}>Agent Name</Text>
             <TextInput
               style={styles.input}
               value={username}
@@ -68,12 +74,12 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Agent ID</Text>
+            <Text style={styles.inputLabel}>Password</Text>
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="Enter your agent ID (e.g., 001)"
+              placeholder="Enter your Password"
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -89,25 +95,16 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.loginAsText}>Access Level</Text>
             <Text style={styles.roleText}>EAMVU Officer</Text>
           </View>
-
-          <View style={styles.helpContainer}>
-            <Text style={styles.helpText}>Available Agents:</Text>
-            {AGENT_CREDENTIALS.map((agent, index) => (
-              <Text key={agent.id} style={styles.agentText}>
-                {agent.name} (ID: {agent.password})
-              </Text>
-            ))}
-          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#3B82F6',
+    // backgroundColor: '#3B82F6',
 
     // backgroundColor: '#f8fafc',
   },
@@ -120,96 +117,69 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: 40,
   },
-  // logoContainer: {
-  //   width: 220,
-  //   height: 220,
-  //   backgroundColor: '#1E40AF',
-  //   // borderRadius: "50%",
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   marginBottom: 20,
-  //   // borderWidth: 2,
-  //   borderColor: '#3B82F6',
-  //   // shadowColor: '#000',
-  //   // shadowOffset: {
-  //   //   width: 0,
-  //   //   height: 4,
-  //   // },
-  //   // shadowOpacity: 0.2,
-  //   // shadowRadius: 8,
-  //   elevation: 8,
-  // },
-  ublLogo: {
-    // width: 150,
-    fontSize: 28,
-    fontWeight: '900',
-    // color: 'white',
-    // letterSpacing: 2,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  ublSubtext: {
-    fontSize: 8,
-    fontWeight: '600',
-    color: 'white',
-    opacity: 0.9,
-    textAlign: 'center',
-    marginTop: 2,
-    letterSpacing: 0.5,
+  logoImage: {
+    width: 120,
+    height: 80,
+    marginBottom: 20,
+    tintColor: 'white',
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#ffffff',
-    margin: 8,
+    color: 'white',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#ffffff',
+    color: 'white',
+    opacity: 0.9,
     textAlign: 'center',
+    marginBottom: 20,
   },
   formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 16,
+    padding: 30,
+    marginHorizontal: 20,
+    backdropFilter: 'blur(10px)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   inputContainer: {
     marginBottom: 20,
   },
-  label: {
+  inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: 'white',
     marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 15,
     fontSize: 16,
-    backgroundColor: '#f9fafb',
+    color: '#1F2937',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   loginButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: 'white',
     borderRadius: 8,
-    paddingVertical: 16,
+    paddingVertical: 15,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   loginButtonText: {
-    color: 'white',
+    color: '#3B82F6',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -222,29 +192,13 @@ const styles = StyleSheet.create({
   },
   loginAsText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#ffffff',
     marginBottom: 4,
   },
   roleText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3B82F6',
-  },
-  helpContainer: {
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
-  },
-  helpText: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 4,
-  },
-  agentText: {
-    fontSize: 14,
-    color: '#4b5563',
-    marginBottom: 2,
+    color: '#ffffff',
   },
 });
 

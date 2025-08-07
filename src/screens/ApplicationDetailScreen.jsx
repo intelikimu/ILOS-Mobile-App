@@ -10,12 +10,58 @@ import {
   StatusBar,
   Linking,
   Modal,
+  TextInput,
 } from 'react-native';
 import { LinearGradient } from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import apiService from '../utils/api';
 import { transformApplicationDetails } from '../utils/dataTransformer';
 import { API_CONFIG, APP_CONSTANTS } from '../utils/config';
+
+// Fallback icon component for when MaterialIcons fail to load
+const FallbackIcon = ({ name, size, color, style }) => {
+  const iconMap = {
+    'play-arrow': '▶',
+    'phone': '📞',
+    'check-circle': '✓',
+    'assignment': '📋',
+    'person': '👤',
+    'location-on': '📍',
+    'work': '💼',
+    'account-balance': '💰',
+    'people': '👥',
+    'arrow-back': '←',
+    'more-vert': '⋮',
+    'close': '✕',
+    'lock': '🔒',
+    'logout': '🚪',
+    'chevron-right': '›',
+    'map': '🗺️',
+    'error': '❌',
+  };
+
+  const icon = iconMap[name] || '•';
+  
+  return (
+    <Text style={[
+      { 
+        fontSize: size * 0.8, // Slightly smaller for better visual balance
+        color,
+        textAlign: 'center',
+        lineHeight: size,
+      }, 
+      style
+    ]}>
+      {icon}
+    </Text>
+  );
+};
+
+// Enhanced icon component with fallback
+const AppIcon = ({ name, size, color, style }) => {
+  // For now, always use fallback icons since MaterialIcons fonts aren't properly linked
+  return <FallbackIcon name={name} size={size} color={color} style={style} />;
+};
 
 const ApplicationDetailScreen = ({ route, navigation }) => {
   const { application } = route.params;
@@ -24,6 +70,13 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
   const [error, setError] = useState(null);
   const [visitModalVisible, setVisitModalVisible] = useState(false);
   const [visitStatus, setVisitStatus] = useState('pending'); // pending, in-progress, completed
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [comments, setComments] = useState({
+    verification: '',
+    employment: '',
+    neighborhood: '',
+    observations: '',
+  });
 
   useEffect(() => {
     fetchApplicationDetails();
@@ -80,12 +133,64 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     Alert.alert('Visit Completed', 'Application has been marked as visited.');
   };
 
+  const handleUpdateStatus = () => {
+    Alert.alert(
+      'Submit Application',
+      'Are you sure you want to submit this application to EAMVU Head?',
+      [
+        { text: 'No', style: 'cancel' },
+        { 
+          text: 'Yes', 
+          onPress: () => submitToEAMVUHead(),
+          style: 'default'
+        },
+      ]
+    );
+  };
+
+  const submitToEAMVUHead = async () => {
+    try {
+      console.log('🔄 Submitting application to EAMVU Head...');
+      console.log('📝 Comments:', comments);
+      
+      // Here you would typically call an API to update the status with comments
+      // For now, we'll just show a success message
+      
+      Alert.alert(
+        'Success',
+        'Application sent to EAMVU Head successfully!',
+        [{ text: 'OK' }]
+      );
+      
+    } catch (error) {
+      console.error('❌ Error submitting to EAMVU Head:', error);
+      Alert.alert(
+        'Error',
+        'Failed to submit application. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
   const handleLogout = () => {
     global.currentAgent = null;
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],
     });
+  };
+
+  const handleChangePassword = () => {
+    setSettingsVisible(false);
+    Alert.alert(
+      'Change Password',
+      'Password change functionality will be implemented here.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleSettingsPress = () => {
+    setSettingsVisible(true);
   };
 
   const renderHeader = () => (
@@ -97,7 +202,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
       
       <View style={styles.headerContent}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color="white" />
+          <AppIcon name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         
         <View style={styles.headerTitle}>
@@ -106,12 +211,8 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
         </View>
         
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Update Status</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingsButton}>
-            <Icon name="more-vert" size={24} color="white" />
+          <TouchableOpacity style={styles.settingsButton} onPress={handleSettingsPress}>
+            <AppIcon name="more-vert" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -127,7 +228,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
 
   const renderErrorState = () => (
     <View style={styles.errorContainer}>
-      <Icon name="error" size={48} color="#EF4444" />
+      <AppIcon name="error" size={48} color="#EF4444" />
       <Text style={styles.errorTitle}>Error Loading Details</Text>
       <Text style={styles.errorMessage}>{error}</Text>
       <TouchableOpacity style={styles.retryButton} onPress={fetchApplicationDetails}>
@@ -144,7 +245,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Icon name="person" size={20} color="#3B82F6" />
+          <AppIcon name="person" size={20} color="#3B82F6" />
           <Text style={styles.sectionTitle}>Applicant Information</Text>
         </View>
         
@@ -193,7 +294,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Icon name="location-on" size={20} color="#3B82F6" />
+          <AppIcon name="location-on" size={20} color="#3B82F6" />
           <Text style={styles.sectionTitle}>Address Information</Text>
         </View>
         
@@ -229,7 +330,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
           </View>
           
           <TouchableOpacity style={styles.mapButton} onPress={handleOpenMaps}>
-            <Icon name="map" size={20} color="#3B82F6" />
+            <AppIcon name="map" size={20} color="#3B82F6" />
             <Text style={styles.mapButtonText}>Open in Maps</Text>
           </TouchableOpacity>
         </View>
@@ -245,7 +346,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Icon name="work" size={20} color="#3B82F6" />
+          <AppIcon name="work" size={20} color="#3B82F6" />
           <Text style={styles.sectionTitle}>Employment Information</Text>
         </View>
         
@@ -302,7 +403,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Icon name="account-balance" size={20} color="#3B82F6" />
+          <AppIcon name="account-balance" size={20} color="#3B82F6" />
           <Text style={styles.sectionTitle}>Financial Information</Text>
         </View>
         
@@ -342,7 +443,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Icon name="people" size={20} color="#3B82F6" />
+          <AppIcon name="people" size={20} color="#3B82F6" />
           <Text style={styles.sectionTitle}>References</Text>
         </View>
         
@@ -376,7 +477,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
   const renderVisitActions = () => (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Icon name="assignment" size={20} color="#3B82F6" />
+        <AppIcon name="assignment" size={20} color="#3B82F6" />
         <Text style={styles.sectionTitle}>Visit Actions</Text>
       </View>
       
@@ -390,11 +491,11 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
         
         <View style={styles.actionButtons}>
           <TouchableOpacity 
-            style={[styles.actionButton, styles.primaryButton]} 
+            style={[styles.actionButton, styles.primaryButton, visitStatus === 'completed' && styles.disabledButton]} 
             onPress={handleStartVisit}
             disabled={visitStatus === 'completed'}
           >
-            <Icon name="play-arrow" size={20} color="white" />
+            <AppIcon name="play-arrow" size={20} color="white" />
             <Text style={styles.primaryButtonText}>Start Visit</Text>
           </TouchableOpacity>
           
@@ -402,19 +503,109 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
             style={[styles.actionButton, styles.secondaryButton]} 
             onPress={handleCallApplicant}
           >
-            <Icon name="phone" size={20} color="#3B82F6" />
+            <AppIcon name="phone" size={20} color="#3B82F6" />
             <Text style={styles.secondaryButtonText}>Call Applicant</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.actionButton, styles.successButton]} 
+            style={[styles.actionButton, styles.successButton, visitStatus !== 'in-progress' && styles.disabledButton]} 
             onPress={handleMarkVisited}
             disabled={visitStatus !== 'in-progress'}
           >
-            <Icon name="check-circle" size={20} color="white" />
+            <AppIcon name="check-circle" size={20} color="white" />
             <Text style={styles.successButtonText}>Mark Visited</Text>
           </TouchableOpacity>
         </View>
+      </View>
+    </View>
+  );
+
+  const renderComments = () => (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <AppIcon name="assignment" size={20} color="#3B82F6" />
+        <Text style={styles.sectionTitle}>Visit Comments</Text>
+      </View>
+      
+      <View style={styles.card}>
+        <View style={styles.commentField}>
+          <Text style={styles.commentLabel}>Verification Comments:</Text>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Does applicant live here? Any verification notes..."
+            value={comments.verification}
+            onChangeText={(text) => setComments({...comments, verification: text})}
+            multiline
+            numberOfLines={3}
+            maxLength={500}
+          />
+          <Text style={styles.characterCount}>{comments.verification.length}/500</Text>
+        </View>
+        
+        <View style={styles.commentField}>
+          <Text style={styles.commentLabel}>Employment Verification:</Text>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Office visit details, employment verification..."
+            value={comments.employment}
+            onChangeText={(text) => setComments({...comments, employment: text})}
+            multiline
+            numberOfLines={3}
+            maxLength={500}
+          />
+          <Text style={styles.characterCount}>{comments.employment.length}/500</Text>
+        </View>
+        
+        <View style={styles.commentField}>
+          <Text style={styles.commentLabel}>Neighborhood Feedback:</Text>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Neighbor verification, community feedback..."
+            value={comments.neighborhood}
+            onChangeText={(text) => setComments({...comments, neighborhood: text})}
+            multiline
+            numberOfLines={3}
+            maxLength={500}
+          />
+          <Text style={styles.characterCount}>{comments.neighborhood.length}/500</Text>
+        </View>
+        
+        <View style={styles.commentField}>
+          <Text style={styles.commentLabel}>General Observations:</Text>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Lifestyle quality, house condition, occupancy status..."
+            value={comments.observations}
+            onChangeText={(text) => setComments({...comments, observations: text})}
+            multiline
+            numberOfLines={3}
+            maxLength={500}
+          />
+          <Text style={styles.characterCount}>{comments.observations.length}/500</Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderSubmitSection = () => (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <AppIcon name="assignment" size={20} color="#3B82F6" />
+        <Text style={styles.sectionTitle}>Submit Application</Text>
+      </View>
+      
+      <View style={styles.card}>
+        <Text style={styles.submitDescription}>
+          Review all information and comments above. Once submitted, this application will be sent to EAMVU Head for final review.
+        </Text>
+        
+        <TouchableOpacity 
+          style={styles.submitButton} 
+          onPress={handleUpdateStatus}
+        >
+          <AppIcon name="check-circle" size={20} color="white" />
+          <Text style={styles.submitButtonText}>Submit to EAMVU Head</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -448,7 +639,67 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
         {renderFinancialInfo()}
         {renderReferences()}
         {renderVisitActions()}
+        {renderComments()}
+        {renderSubmitSection()}
       </ScrollView>
+
+      {/* Settings Modal */}
+      <Modal
+        visible={settingsVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setSettingsVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setSettingsVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Account Settings</Text>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setSettingsVisible(false)}
+              >
+                <AppIcon name="close" size={20} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.settingsOption}
+              onPress={handleChangePassword}
+            >
+              <View style={styles.optionContent}>
+                <View style={styles.optionIcon}>
+                  <AppIcon name="lock" size={20} color="#3B82F6" />
+                </View>
+                <View style={styles.optionText}>
+                  <Text style={styles.optionTitle}>Change Password</Text>
+                  <Text style={styles.optionSubtitle}>Update your account password</Text>
+                </View>
+                <AppIcon name="chevron-right" size={20} color="#9CA3AF" />
+              </View>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.settingsOption}
+              onPress={handleLogout}
+            >
+              <View style={styles.optionContent}>
+                <View style={styles.optionIcon}>
+                  <AppIcon name="logout" size={20} color="#EF4444" />
+                </View>
+                <View style={styles.optionText}>
+                  <Text style={styles.optionTitle}>Logout</Text>
+                  <Text style={styles.optionSubtitle}>Sign out of your account</Text>
+                </View>
+                <AppIcon name="chevron-right" size={20} color="#9CA3AF" />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -462,6 +713,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
+    // backgroundColor: '#3B82F6', // Solid blue background
   },
   headerContent: {
     flexDirection: 'row',
@@ -585,8 +837,13 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   statusBadgeText: {
     color: 'white',
@@ -601,7 +858,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   primaryButton: {
     backgroundColor: '#3B82F6',
@@ -609,6 +871,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 16,
     marginLeft: 8,
   },
   secondaryButton: {
@@ -619,6 +882,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#3B82F6',
     fontWeight: '600',
+    fontSize: 16,
     marginLeft: 8,
   },
   successButton: {
@@ -627,6 +891,7 @@ const styles = StyleSheet.create({
   successButtonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 16,
     marginLeft: 8,
   },
   loadingContainer: {
@@ -668,6 +933,127 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: 'white',
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    width: '80%',
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  closeButton: {
+    padding: 8,
+  },
+  settingsOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  optionIcon: {
+    marginRight: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionText: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  optionSubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  commentField: {
+    marginBottom: 16,
+  },
+  commentLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  commentInput: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#1F2937',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  characterCount: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'right',
+    marginTop: 4,
+  },
+  submitDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  submitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#059669',
+    padding: 18,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 18,
+    marginLeft: 8,
   },
 });
 
