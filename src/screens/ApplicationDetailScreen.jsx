@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
-  Alert,
+  ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
+  Alert,
   StatusBar,
-  Linking,
+  Image,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import apiService from '../utils/api';
 import { transformApplicationDetails } from '../utils/dataTransformer';
 import { API_CONFIG, APP_CONSTANTS } from '../utils/config';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs';
+import { PermissionsAndroid, Linking } from 'react-native';
 
 // Fallback icon component for when MaterialIcons fail to load
 const FallbackIcon = ({ name, size, color, style }) => {
@@ -70,13 +73,14 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
   const [error, setError] = useState(null);
   const [visitModalVisible, setVisitModalVisible] = useState(false);
   const [visitStatus, setVisitStatus] = useState('pending'); // pending, in-progress, completed
-  const [settingsVisible, setSettingsVisible] = useState(false);
   const [comments, setComments] = useState({
     verification: '',
     employment: '',
     neighborhood: '',
     observations: '',
   });
+  const [uploadedDocuments, setUploadedDocuments] = useState([]);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   useEffect(() => {
     fetchApplicationDetails();
@@ -191,6 +195,137 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
 
   const handleSettingsPress = () => {
     setSettingsVisible(true);
+  };
+
+  const handleUploadDocument = async () => {
+    Alert.alert(
+      'Upload Document',
+      'Choose how you want to upload a document:',
+      [
+        {
+          text: 'Camera',
+          onPress: async () => {
+            try {
+              const result = await launchCamera({
+                mediaType: 'mixed',
+                maxWidth: 1024,
+                maxHeight: 1024,
+                quality: 0.8,
+              });
+
+              if (result.assets && result.assets.length > 0) {
+                const newDocuments = result.assets.map(asset => ({
+                  name: asset.fileName || `photo_${Date.now()}.jpg`,
+                  size: `${(asset.fileSize / 1024).toFixed(2)} MB`,
+                  type: asset.type,
+                  uri: asset.uri,
+                }));
+                setUploadedDocuments(prev => [...prev, ...newDocuments]);
+                Alert.alert('Success', `${result.assets.length} document(s) uploaded successfully!`);
+              }
+            } catch (err) {
+              if (!err.didCancel) {
+                Alert.alert('Error', 'Failed to take photo. Please try again.');
+                console.error(err);
+              }
+            }
+          },
+        },
+        {
+          text: 'Gallery',
+          onPress: async () => {
+            try {
+              const result = await launchImageLibrary({
+                mediaType: 'mixed',
+                maxWidth: 1024,
+                maxHeight: 1024,
+                quality: 0.8,
+                selectionLimit: 10,
+              });
+
+              if (result.assets && result.assets.length > 0) {
+                const newDocuments = result.assets.map(asset => ({
+                  name: asset.fileName || 'Unknown',
+                  size: `${(asset.fileSize / 1024).toFixed(2)} MB`,
+                  type: asset.type,
+                  uri: asset.uri,
+                }));
+                setUploadedDocuments(prev => [...prev, ...newDocuments]);
+                Alert.alert('Success', `${result.assets.length} document(s) uploaded successfully!`);
+              }
+            } catch (err) {
+              if (!err.didCancel) {
+                Alert.alert('Error', 'Failed to pick document. Please try again.');
+                console.error(err);
+              }
+            }
+          },
+        },
+        {
+          text: 'File Explorer',
+          onPress: async () => {
+            try {
+              // Use image picker with document-specific settings
+              const result = await launchImageLibrary({
+                mediaType: 'mixed',
+                includeBase64: false,
+                maxWidth: 0,
+                maxHeight: 0,
+                quality: 1,
+                selectionLimit: 10,
+                includeExtra: true,
+                presentationStyle: 'fullScreen',
+                showSelectedAssets: true,
+                showCropGuidelines: false,
+                hideBottomControls: false,
+                // Additional settings for better file access
+                includeData: false,
+                saveToPhotos: false,
+                // Force document picker mode
+                forceDocumentPicker: true,
+              });
+
+              if (result.assets && result.assets.length > 0) {
+                const newDocuments = result.assets.map(asset => ({
+                  name: asset.fileName || 'Unknown',
+                  size: `${(asset.fileSize / 1024).toFixed(2)} MB`,
+                  type: asset.type,
+                  uri: asset.uri,
+                }));
+                setUploadedDocuments(prev => [...prev, ...newDocuments]);
+                Alert.alert('Success', `${result.assets.length} document(s) uploaded successfully!`);
+              }
+            } catch (err) {
+              if (!err.didCancel) {
+                Alert.alert('Error', 'Failed to access file system. Please try again.');
+                console.error(err);
+              }
+            }
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const handleDeleteDocument = (index) => {
+    setUploadedDocuments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePreviewDocument = (document) => {
+    Alert.alert(
+      'Document Preview',
+      `Name: ${document.name}\nSize: ${document.size}\nType: ${document.type}`,
+      [
+        {
+          text: 'OK',
+          style: 'default',
+        },
+      ]
+    );
   };
 
   const renderHeader = () => (
@@ -587,6 +722,42 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
     </View>
   );
 
+  const renderUploadDocuments = () => (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <AppIcon name="upload" size={20} color="#3B82F6" />
+        <Text style={styles.sectionTitle}>Upload Documents</Text>
+      </View>
+      
+      <View style={styles.card}>
+        <TouchableOpacity style={styles.uploadButton} onPress={handleUploadDocument}>
+          <AppIcon name="add" size={24} color="white" />
+          <Text style={styles.uploadButtonText}>Upload Document</Text>
+        </TouchableOpacity>
+        
+        {uploadedDocuments.length === 0 ? (
+          <View style={styles.noDocumentsContainer}>
+            <AppIcon name="description" size={40} color="#D1D5DB" />
+            <Text style={styles.noDocumentsText}>No documents uploaded yet</Text>
+            <Text style={styles.noDocumentsSubtext}>Tap the button above to upload documents</Text>
+          </View>
+        ) : (
+          <View style={styles.documentsList}>
+            {uploadedDocuments.map((doc, index) => (
+              <TouchableOpacity key={index} style={styles.documentItem} onPress={() => handlePreviewDocument(doc)}>
+                <AppIcon name="description" size={20} color="#3B82F6" />
+                <Text style={styles.documentName}>{doc.name}</Text>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteDocument(index)}>
+                  <AppIcon name="delete" size={16} color="#EF4444" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
+    </View>
+  );
+
   const renderSubmitSection = () => (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
@@ -640,6 +811,7 @@ const ApplicationDetailScreen = ({ route, navigation }) => {
         {renderReferences()}
         {renderVisitActions()}
         {renderComments()}
+        {renderUploadDocuments()}
         {renderSubmitSection()}
       </ScrollView>
 
@@ -1054,6 +1226,64 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 18,
     marginLeft: 8,
+  },
+  uploadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3B82F6',
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  uploadButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  documentsList: {
+    marginTop: 16,
+  },
+  documentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  documentName: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1F2937',
+    marginLeft: 12,
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  noDocumentsContainer: {
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  noDocumentsText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginTop: 15,
+  },
+  noDocumentsSubtext: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 5,
+    textAlign: 'center',
   },
 });
 
