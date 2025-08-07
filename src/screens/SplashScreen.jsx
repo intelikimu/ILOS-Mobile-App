@@ -65,13 +65,10 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   ublLogo: {
-    fontSize: 42,
-    fontWeight: '900',
-    color: 'white',
-    letterSpacing: 3,
-    textAlign: 'center',
+    width: 120,
+    height: 80,
+    tintColor: 'white',
     marginBottom: 30,
-    fontFamily: 'monospace', // Professional banking font
   },
   ublSubtext: {
     fontSize: 11,

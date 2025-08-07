@@ -140,12 +140,21 @@ const transformStatus = (status) => {
   
   const statusMap = {
     'SUBMITTED_BY_SPU': 'Submitted by SPU',
+    'submitted_by_spu': 'Submitted by SPU',
     'SUBMITTED_TO_COPS': 'Submitted to COPS',
+    'submitted_to_cops': 'Submitted to COPS',
     'SUBMITTED_TO_CIU': 'Submitted to CIU',
+    'submitted_to_ciu': 'Submitted to CIU',
     'SUBMITTED_TO_RRU': 'Submitted to RRU',
+    'submitted_to_rru': 'Submitted to RRU',
     'APPROVED': 'Approved',
+    'approved': 'Approved',
     'REJECTED': 'Rejected',
+    'rejected': 'Rejected',
     'RETURNED': 'Returned',
+    'returned': 'Returned',
+    'assigned_to_eavmu_officer': 'Assigned to EAMVU Officer',
+    'returned_by_eavmu_officer': 'Returned by EAMVU Officer',
   };
   
   return statusMap[status] || status;

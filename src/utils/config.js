@@ -29,11 +29,16 @@ const getCurrentEnv = () => {
 const currentEnv = getCurrentEnv();
 const config = ENV[currentEnv];
 
-// Export configuration
+// API Configuration
 export const API_CONFIG = {
-  BASE_URL: config.API_BASE_URL,
-  TIMEOUT: config.API_TIMEOUT,
-  DEBUG: config.DEBUG,
+  // Base URL for API calls - Updated to Vercel deployment
+  API_BASE_URL: 'https://ilos-backend.vercel.app',
+  
+  // Timeout settings
+  TIMEOUT: 30000, // 30 seconds
+  
+  // Debug mode
+  DEBUG: true,
 };
 
 // API Endpoints
@@ -48,6 +53,9 @@ export const API_ENDPOINTS = {
   UPDATE_COMMENT: '/api/applications/update-comment',
   APPLICATION_COMMENTS: (losId) => `/api/applications/comments/${losId}`,
   
+  // Agent Assignments - New endpoint
+  AGENT_ASSIGNMENTS: '/api/applications/test/assignments',
+  
   // Customer & CIF
   CUSTOMER_STATUS: '/getNTB_ETB',
   CIF_DETAILS: (consumerId) => `/cif/${consumerId}`,
@@ -60,6 +68,15 @@ export const API_ENDPOINTS = {
   TEST_BACKEND: '/health',
   TEST_APPLICATIONS: '/api/test-applications',
 };
+
+// Agent credentials for login
+export const AGENT_CREDENTIALS = [
+  { id: 'agent-001', name: 'Ahmad Hassan', password: '001' },
+  { id: 'agent-002', name: 'Fatima Ali', password: '002' },
+  { id: 'agent-003', name: 'Muhammad Khan', password: '003' },
+  { id: 'agent-004', name: 'Aisha Sheikh', password: '004' },
+  { id: 'agent-005', name: 'Sara Ahmed', password: '005' },
+];
 
 // Status mappings for EAMVU - Updated to match new backend status values
 export const EAMVU_STATUS_OPTIONS = [
@@ -123,12 +140,21 @@ export const APP_CONSTANTS = {
   // Status colors - Updated to match new backend status values
   STATUS_COLORS: {
     'SUBMITTED_BY_SPU': '#3B82F6',
+    'submitted_by_spu': '#3B82F6',
     'SUBMITTED_TO_COPS': '#F59E0B',
+    'submitted_to_cops': '#F59E0B',
     'SUBMITTED_TO_CIU': '#EF4444',
+    'submitted_to_ciu': '#EF4444',
     'SUBMITTED_TO_RRU': '#EC4899',
+    'submitted_to_rru': '#EC4899',
     'APPROVED': '#059669',
+    'approved': '#059669',
     'REJECTED': '#DC2626',
+    'rejected': '#DC2626',
     'RETURNED': '#F97316',
+    'returned': '#F97316',
+    'assigned_to_eavmu_officer': '#3B82F6',
+    'returned_by_eavmu_officer': '#059669',
   },
   
   // Priority colors

@@ -28,40 +28,34 @@ export const testBackendConnection = async () => {
   try {
     debugLog('🔍 Testing backend connection...');
     
-    // First test basic connectivity
-    const hasInternet = await testNetworkConnectivity();
-    if (!hasInternet) {
-      return {
-        success: false,
-        error: 'No internet connectivity',
-        message: 'Please check your internet connection and try again.'
-      };
+    const response = await fetch('https://ilos-backend.vercel.app/health', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    // Test 1: Health check
-    console.log('📡 Testing health endpoint...');
-    const healthResponse = await apiService.checkHealth();
-    console.log('✅ Health check successful:', healthResponse);
-    
-    // Test 2: EAMVU applications
-    console.log('📡 Testing EAMVU applications endpoint...');
-    const applicationsResponse = await apiService.getEAMVUApplications();
-    console.log('✅ EAMVU applications fetched:', applicationsResponse?.length || 0, 'applications');
+    const data = await response.json();
+    console.log('✅ Backend connection successful:', data);
     
     return {
       success: true,
-      health: healthResponse,
-      applications: applicationsResponse,
-      message: 'All connection tests passed successfully'
+      data,
+      message: 'Backend connection successful'
     };
     
   } catch (error) {
-    debugError('❌ Connection test failed:', error);
+    debugError('❌ Backend connection failed:', error);
     
     return {
       success: false,
       error: error.message,
-      message: 'Connection test failed. Please check your backend server.'
+      message: `Backend connection failed: ${error.message}`
     };
   }
 };
@@ -102,6 +96,50 @@ export const testSpecificEndpoint = async (endpoint) => {
   }
 };
 
+export const testAgentAssignments = async () => {
+  try {
+    debugLog('🔍 Testing agent assignments endpoint...');
+    
+    const response = await fetch('https://ilos-backend.vercel.app/api/applications/test/assignments', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('✅ Agent assignments endpoint successful:', data);
+    
+    // Test filtering for a specific agent
+    const agent001Assignments = data.assignments.filter(assignment => 
+      assignment.agent_id === 'agent-001' && assignment.assignment_status === 'active'
+    );
+    
+    console.log('✅ Agent-001 active assignments:', agent001Assignments);
+    
+    return {
+      success: true,
+      data,
+      agentAssignments: agent001Assignments,
+      message: `Agent assignments endpoint working. Found ${data.total_assignments} total assignments.`
+    };
+    
+  } catch (error) {
+    debugError('❌ Agent assignments endpoint failed:', error);
+    
+    return {
+      success: false,
+      error: error.message,
+      message: `Agent assignments endpoint failed: ${error.message}`
+    };
+  }
+};
+
 export const runAllTests = async () => {
   console.log('🧪 Running all connection tests...');
   
@@ -110,6 +148,7 @@ export const runAllTests = async () => {
     backend: await testBackendConnection(),
     health: await testSpecificEndpoint('/health'),
     eamvu: await testSpecificEndpoint('/api/applications/department/eamvu'),
+    assignments: await testAgentAssignments(),
   };
   
   console.log('📊 Test Results:', results);
@@ -121,5 +160,6 @@ export default {
   testNetworkConnectivity,
   testBackendConnection,
   testSpecificEndpoint,
+  testAgentAssignments,
   runAllTests,
 }; 

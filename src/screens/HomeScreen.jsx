@@ -29,23 +29,38 @@ const HomeScreen = ({ navigation }) => {
       setLoading(true);
       setError(null);
       
-      console.log('🔄 Fetching EAMVU applications...');
-      const response = await apiService.getEAMVUApplications();
-      
-      if (response && Array.isArray(response)) {
-        console.log(`✅ Successfully fetched ${response.length} applications`);
-        // Transform the backend data to mobile-friendly format
-        const transformedApplications = transformEAMVUApplications(response);
-        setApplications(transformedApplications);
-      } else {
-        console.log('⚠️ No applications found or invalid response format');
-        setApplications([]);
+      // Get current agent from global storage
+      const currentAgent = global.currentAgent;
+      if (!currentAgent) {
+        setError('No agent information found. Please login again.');
+        return;
       }
+
+      console.log('🔄 Fetching applications for agent:', currentAgent.id);
+      
+      // First, test basic connectivity
+      try {
+        const healthResponse = await fetch('https://ilos-backend.vercel.app/health');
+        if (!healthResponse.ok) {
+          throw new Error('Backend health check failed');
+        }
+        console.log('✅ Backend health check passed');
+      } catch (healthError) {
+        console.error('❌ Backend health check failed:', healthError);
+        setError('Backend server is not accessible. Please check if the server is running.');
+        return;
+      }
+      
+      // Use the new API to get assigned applications for this agent
+      const applications = await apiService.getAssignedApplicationsForAgent(currentAgent.id);
+      
+      console.log('✅ Fetched applications:', applications.length);
+      setApplications(transformEAMVUApplications(applications));
+      
     } catch (error) {
-      console.error('❌ Error fetching applications:', error.message);
+      console.error('❌ Error fetching applications:', error);
       setError(error.message);
       
-      // Show error alert
       Alert.alert(
         'Connection Error',
         'Unable to fetch applications. Please check your internet connection and try again.',
@@ -53,7 +68,8 @@ const HomeScreen = ({ navigation }) => {
           { text: 'OK', onPress: () => setError(null) },
           { text: 'Retry', onPress: fetchApplications },
           { text: 'Test Connection', onPress: handleTestConnection },
-          { text: 'Manual Test', onPress: handleManualTest }
+          { text: 'Manual Test', onPress: handleManualTest },
+          { text: 'Debug Data', onPress: handleDebugData }
         ]
       );
     } finally {
@@ -88,7 +104,7 @@ const HomeScreen = ({ navigation }) => {
       
       // Test 1: Check if we can reach the backend
       console.log('📡 Testing direct fetch to backend...');
-      const response = await fetch('http://10.0.2.2:5000/api/applications/department/eamvu');
+      const response = await fetch('https://ilos-backend.vercel.app/api/applications/department/eamvu');
       console.log('📡 Response status:', response.status);
       console.log('📡 Response ok:', response.ok);
       
@@ -101,9 +117,60 @@ const HomeScreen = ({ navigation }) => {
         Alert.alert('Manual Test', `❌ Direct fetch failed: ${response.status} ${response.statusText}`);
       }
       
+      // Test 2: Check agent assignments endpoint
+      console.log('📡 Testing agent assignments endpoint...');
+      const assignmentsResponse = await fetch('https://ilos-backend.vercel.app/api/applications/test/assignments');
+      console.log('📡 Assignments response status:', assignmentsResponse.status);
+      
+      if (assignmentsResponse.ok) {
+        const assignmentsData = await assignmentsResponse.json();
+        console.log('✅ Agent assignments successful:', assignmentsData);
+        Alert.alert('Assignments Test', `✅ Agent assignments working! Found ${assignmentsData.total_assignments} assignments.`);
+      } else {
+        console.log('❌ Agent assignments failed:', assignmentsResponse.status, assignmentsResponse.statusText);
+        Alert.alert('Assignments Test', `❌ Agent assignments failed: ${assignmentsResponse.status} ${assignmentsResponse.statusText}`);
+      }
+      
     } catch (error) {
       console.error('❌ Manual test error:', error);
       Alert.alert('Manual Test Error', `Error: ${error.message}`);
+    }
+  };
+
+  // Debug function to test data flow
+  const handleDebugData = async () => {
+    try {
+      console.log('🧪 Debug: Testing data flow...');
+      
+      // Test 1: Get EAMVU applications
+      const eamvuResponse = await fetch('http://10.0.2.2:5000/api/applications/department/eamvu');
+      const eamvuData = await eamvuResponse.json();
+      console.log('📊 EAMVU applications:', eamvuData.length);
+      
+      // Test 2: Get agent assignments
+      const assignmentsResponse = await fetch('http://10.0.2.2:5000/api/applications/test/assignments');
+      const assignmentsData = await assignmentsResponse.json();
+      console.log('📊 Total assignments:', assignmentsData.total_assignments);
+      
+      // Test 3: Filter for agent-001 active assignments
+      const agent001Assignments = assignmentsData.assignments.filter(a => 
+        a.agent_id === 'agent-001' && a.assignment_status === 'active'
+      );
+      console.log('📊 Agent-001 active assignments:', agent001Assignments);
+      
+      // Test 4: Check if assigned applications exist in EAMVU data
+      agent001Assignments.forEach(assignment => {
+        const matchingApp = eamvuData.find(app => 
+          parseInt(app.los_id.replace('LOS-', '')) === assignment.los_id
+        );
+        console.log(`🔍 Assignment ${assignment.los_id}: found=${!!matchingApp}, status=${matchingApp?.status}`);
+      });
+      
+      Alert.alert('Debug Info', `EAMVU: ${eamvuData.length}, Assignments: ${assignmentsData.total_assignments}, Agent-001 Active: ${agent001Assignments.length}`);
+      
+    } catch (error) {
+      console.error('❌ Debug error:', error);
+      Alert.alert('Debug Error', error.message);
     }
   };
 
@@ -130,7 +197,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleLogout = () => {
-    setSettingsVisible(false);
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -140,11 +206,10 @@ const HomeScreen = ({ navigation }) => {
           text: 'Logout', 
           style: 'destructive',
           onPress: () => {
-            // Navigate back to login screen
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Login' }],
-            });
+            // Clear agent information
+            global.currentAgent = null;
+            // Navigate back to login
+            navigation.replace('Login');
           }
         }
       ]
@@ -238,8 +303,8 @@ const HomeScreen = ({ navigation }) => {
           </View>
           <View style={styles.headerText}>
             <Text style={styles.welcomeText}>Welcome,</Text>
-            <Text style={styles.userName}>EAMVU Officer</Text>
-            <Text style={styles.roleText}>ILOS Mobile App</Text>
+            <Text style={styles.userName}>{global.currentAgent?.name || 'EAMVU Officer'}</Text>
+            <Text style={styles.roleText}>Agent ID: {global.currentAgent?.id || 'Unknown'}</Text>
           </View>
           <TouchableOpacity 
             style={styles.settingsButton}

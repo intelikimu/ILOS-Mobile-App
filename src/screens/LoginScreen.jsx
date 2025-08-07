@@ -11,6 +11,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { AGENT_CREDENTIALS } from '../utils/config';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -22,8 +23,15 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    // Mock login validation
-    if (username === 'eamvu' && password === 'password123') {
+    // Check against agent credentials
+    const agent = AGENT_CREDENTIALS.find(cred => 
+      cred.name.toLowerCase() === username.toLowerCase() && 
+      cred.password === password
+    );
+
+    if (agent) {
+      // Store agent info for use in the app
+      global.currentAgent = agent;
       navigation.replace('Home');
     } else {
       Alert.alert('Error', 'Invalid credentials. Please try again.');
@@ -35,14 +43,12 @@ const LoginScreen = ({ navigation }) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+      <StatusBar barStyle="light-content" backgroundColor="#3B82F6" />
       <View style={styles.content}>
         <View style={styles.header}>
           {/* Professional UBL Text Logo */}
           <View >
             <Image source={require('../assets/images/ublimage.png')} style={styles.ublLogo} />
-            {/* <Text style={styles.ublLogo}>UBL</Text>
-            <Text style={styles.ublSubtext}>United Bank Limited</Text> */}
           </View>
           <Text style={styles.title}>ILOS</Text>
           <Text style={styles.subtitle}>Intelligent Loan Origination System</Text>
@@ -50,27 +56,28 @@ const LoginScreen = ({ navigation }) => {
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Username</Text>
+            <Text style={styles.label}>Agent Name</Text>
             <TextInput
               style={styles.input}
               value={username}
               onChangeText={setUsername}
-              placeholder="Enter your username"
-              autoCapitalize="none"
+              placeholder="Enter your full name"
+              autoCapitalize="words"
               autoCorrect={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Agent ID</Text>
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="Enter your password"
+              placeholder="Enter your agent ID (e.g., 001)"
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
+              keyboardType="numeric"
             />
           </View>
 
@@ -81,6 +88,15 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.loginAsContainer}>
             <Text style={styles.loginAsText}>Access Level</Text>
             <Text style={styles.roleText}>EAMVU Officer</Text>
+          </View>
+
+          <View style={styles.helpContainer}>
+            <Text style={styles.helpText}>Available Agents:</Text>
+            {AGENT_CREDENTIALS.map((agent, index) => (
+              <Text key={agent.id} style={styles.agentText}>
+                {agent.name} (ID: {agent.password})
+              </Text>
+            ))}
           </View>
         </View>
       </View>
@@ -213,6 +229,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#3B82F6',
+  },
+  helpContainer: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  helpText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  agentText: {
+    fontSize: 14,
+    color: '#4b5563',
+    marginBottom: 2,
   },
 });
 

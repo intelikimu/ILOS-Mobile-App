@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { API_CONFIG, API_ENDPOINTS, ERROR_MESSAGES, debugLog, debugError } from './config';
 
-// Create axios instance with default configuration
+// Create axios instance with configuration
 const apiClient = axios.create({
-  baseURL: API_CONFIG.BASE_URL,
+  baseURL: API_CONFIG.API_BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
@@ -111,7 +111,11 @@ class ILOSApiService {
   async getApplicationDetails(losId) {
     try {
       debugLog(`Fetching application details for LOS ID: ${losId}`);
-      const response = await apiClient.get(API_ENDPOINTS.APPLICATION_DETAILS(losId));
+      
+      // Extract numeric ID from LOS-XXX format
+      const numericId = losId.replace('LOS-', '');
+      
+      const response = await apiClient.get(API_ENDPOINTS.APPLICATION_DETAILS(numericId));
       return response.data;
     } catch (error) {
       throw handleApiError(error, 'Failed to fetch application details');
@@ -309,6 +313,84 @@ class ILOSApiService {
       return stats;
     } catch (error) {
       throw handleApiError(error, 'Failed to fetch application statistics');
+    }
+  }
+
+  // Get Agent Assignments
+  async getAgentAssignments() {
+    try {
+      debugLog('Fetching agent assignments...');
+      const response = await apiClient.get(API_ENDPOINTS.AGENT_ASSIGNMENTS);
+      
+      if (response.data && response.data.assignments) {
+        debugLog(`Successfully fetched ${response.data.assignments.length} agent assignments`);
+        return response.data;
+      } else {
+        debugLog('No assignments found or invalid response format');
+        return { total_assignments: 0, assignments: [] };
+      }
+    } catch (error) {
+      throw handleApiError(error, 'Failed to fetch agent assignments');
+    }
+  }
+
+  // Get Assigned Applications for Specific Agent
+  async getAssignedApplicationsForAgent(agentId) {
+    try {
+      debugLog(`Fetching assigned applications for agent: ${agentId}`);
+      
+      // First, get all EAMVU applications
+      const eamvuResponse = await apiClient.get(API_ENDPOINTS.EAMVU_APPLICATIONS);
+      const eamvuData = eamvuResponse.data;
+      
+      console.log('✅ EAMVU applications fetched:', eamvuData.length);
+      
+      try {
+        // Then, get agent assignments
+        const assignmentsResponse = await this.getAgentAssignments();
+        const assignmentsData = assignmentsResponse.assignments;
+        
+        console.log('✅ Agent assignments fetched:', assignmentsData.length);
+        
+        // Filter assignments for this specific agent with active status
+        const agentAssignments = assignmentsData.filter(assignment => 
+          assignment.agent_id === agentId && assignment.assignment_status === 'active'
+        );
+        
+        console.log('✅ Active assignments for agent', agentId, ':', agentAssignments.length);
+        
+        // Filter EAMVU applications to only show those assigned to this specific agent
+        const assignedApplications = eamvuData.filter(app => {
+          const isAssignedToThisAgent = agentAssignments.some(assignment => 
+            assignment.los_id === parseInt(app.los_id.replace('LOS-', ''))
+          );
+          
+          const hasValidStatus = app.status === 'submitted_by_spu' || app.status === 'assigned_to_eavmu_officer';
+          
+          console.log(`🔍 App ${app.los_id}: status=${app.status}, assigned=${isAssignedToThisAgent}, valid=${hasValidStatus}`);
+          
+          // Include applications that are either submitted by SPU or assigned to EAMVU officer
+          return hasValidStatus && isAssignedToThisAgent;
+        });
+        
+        debugLog(`Found ${assignedApplications.length} applications assigned to agent ${agentId}`);
+        return assignedApplications;
+        
+      } catch (assignmentError) {
+        console.warn('⚠️ Agent assignments API failed, showing all EAMVU applications:', assignmentError.message);
+        
+        // Fallback: show all EAMVU applications if assignment API fails
+        const allEAMVUApplications = eamvuData.filter(app => 
+          app.status === 'submitted_by_spu' || app.status === 'assigned_to_eavmu_officer'
+        );
+        
+        debugLog(`Fallback: Showing ${allEAMVUApplications.length} EAMVU applications`);
+        return allEAMVUApplications;
+      }
+      
+    } catch (error) {
+      console.error('❌ Error in getAssignedApplicationsForAgent:', error);
+      throw handleApiError(error, 'Failed to fetch assigned applications for agent');
     }
   }
 }
